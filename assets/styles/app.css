@@ -17,6 +17,7 @@ body {
 
 .container {
     height:100vh;
+    max-width: 750px;
 }
 
 .rentability {
@@ -140,4 +141,11 @@ form {
 li {
     margin-top:13px;
     list-style: none;
+}
+
+@media screen and (max-width: 576px)
+{
+    .marginmobil {
+        padding-top: 0rem!important;
+    }
 }
