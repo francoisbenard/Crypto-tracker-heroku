@@ -19,7 +19,7 @@ class CryptoController extends AbstractController
 {
 
 //   page liste cryptos
-    #[Route('/home', name: 'home')]
+    #[Route('/', name: 'home')]
     public function index(ManagerRegistry $doctrine): Response
     {
         // Récupération des data de l'API
