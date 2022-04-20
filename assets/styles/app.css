@@ -149,3 +149,10 @@ li {
         padding-top: 0rem!important;
     }
 }
+
+@media screen and (max-width: 576px)
+{
+    .marginmobil {
+        padding-top: 0rem!important;
+    }
+}

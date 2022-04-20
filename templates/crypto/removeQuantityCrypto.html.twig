@@ -8,7 +8,7 @@
     </div>
     <hr class="m-0">
     <div class="container-crypto container">
-    <div class=" mt-5 pt-5 marginmobil">
+    <div class=" mt-5 pt-5 marginmobil" style="height: 80vh;">
 
         {{ form_start(form) }}
         <div class="input-container border border-white  border-1 rounded-3">
@@ -20,7 +20,7 @@
             <i class="fa fa-database icon"></i>
             {{ form_widget(form.quantity, {'attr': {'class': 'input-field', 'placeholder': 'Quantité'}}) }}
         </div>
-        <div class="row justify-content-center fixed-bottom m-5">
+        <div class="row justify-content-center align-items-end m-5" style="height: 30vh;">
             <input type="submit" class="btn" value="VALIDER"/>
         </div>
         {{ form_end(form) }}
