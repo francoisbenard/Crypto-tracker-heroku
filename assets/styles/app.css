@@ -24,6 +24,7 @@ body {
     font-size: 51px;
     font-weight: 700;
     background-image: url('/assets/img/background.png');
+    background-position: center;
 }
 
 .logo {
