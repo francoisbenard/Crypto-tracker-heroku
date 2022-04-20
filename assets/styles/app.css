@@ -155,4 +155,10 @@ li {
     .marginmobil {
         padding-top: 0rem!important;
     }
+    .logo {
+        font-size: 25px;
+    }
+    .titre-page {
+        font-size: 20px;
+    }
 }
