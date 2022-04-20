@@ -20,11 +20,6 @@
             <i class="fa fa-database icon"></i>
             {{ form_widget(form.quantity, {'attr': {'class': 'input-field', 'placeholder': 'Quantité'}}) }}
         </div>
-        <div class="row justify-content-center align-items-end m-5" style="height: 30vh;">
-            <input type="submit" class="btn" value="VALIDER"/>
-        </div>
-        {{ form_end(form) }}
-
         {# message si erreur de saisie ou si on essaie d'enlever une quantité suppérieure à celle que l'on acheté  #}
         <div class="">
             {{ message }}
@@ -32,5 +27,11 @@
         <div>
             {{ message2 }}
         </div>
+        <div class="row justify-content-center align-items-end m-5" style="height: 30vh;">
+            <input type="submit" class="btn" value="VALIDER"/>
+        </div>
+        {{ form_end(form) }}
+
+
     </div>
 {% endblock %}
