@@ -18,7 +18,15 @@ class BuyCryptoType extends AbstractType
             ->add('crypto', EntityType::class, [
                 'class' => Cryptolist::class,
                 'choice_label' => 'name',])
-            ->add('quantity')
+            ->add('quantity', NumberType::class, array (
+                'required' => true,
+                'scale' => 2,
+                'attr' => array(
+                    'min' => 0,
+                    'max' => 1000000,
+                    'step' => 0.0000001,
+                ),
+            ))
             ->add('price', NumberType::class, array (
                 'required' => true,
                 'scale' => 2,
