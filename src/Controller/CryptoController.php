@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\API\APIdata;
+use App\Rentability\RentabilityCounting;
 use App\Entity\Cryptolist;
 use App\Entity\Mycrypto;
 use App\Entity\Save;
 use App\Form\BuyCryptoType;
 use App\Form\RemoveCryptoQuantityType;
+use App\Service\CryptoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,9 +26,11 @@ class CryptoController extends AbstractController
     public function index(ManagerRegistry $doctrine): Response
     {
         // Récupération des data de l'API
-        $dataAPI = $this->getAPI();
+        $APIdata = new APIdata();
+        $dataAPI = $APIdata->getAPI();
         // Récupération du calcul de la rentabilité
-        $totalRentability = $this->getRentability($doctrine);
+        $rentabilityCounting = new RentabilityCounting();
+        $totalRentability = $rentabilityCounting->getRentability($doctrine);
         // Récupération des mycryptos, ce sont ceux qu'on a acheté
         $myCryptos = $doctrine->getRepository(Mycrypto::class)->findAll();
         // Récupération de la liste des cryptos disponibles et que l'on a saisie en base de données
@@ -37,74 +42,63 @@ class CryptoController extends AbstractController
 
     // On déclenche la sauvegarde en allant sur /save (A mettre en place dans un CRON avec déclenchement quotidien)
     #[Route('/save', name: 'save')]
-    public function save(ManagerRegistry $doctrine): response
+    public function save(CryptoService $cryptoService): response
     {
-        $dailySaved = $doctrine->getRepository(Save::class);
-        $totalRentability = $this->getRentability($doctrine);
-        $today = date('Y-m-d');
-        // On vérifie qu'il n'y a pas eu déjà une sauvegarde aujourd'hui
-        if ($dailySaved->findByDate($today) == null) {
-            $saveRentability = new Save();
-            $saveRentability->setDate($today);
-            $saveRentability->setTotal(round($totalRentability));
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($saveRentability);
-            $entityManager->flush();
-        }
+        $cryptoService->save();
         return $this->redirectToRoute('home');
     }
 
 
     // Fonction pour récupérer les data de l'API (code issu de la documentation)
 
-    public function getAPI()
-    {
-        $url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
-        $parameters = [
-            // on récupère les 10 cryptos les plus courantes.
-            'symbol' => 'BTC,ETH,BNB,USDT,SOL,XRP,ADA,USDC,LUNA,AVAX',
-            'convert' => 'EUR'
-        ];
-        $headers = [
-            'Accepts: application/json',
-            'X-CMC_PRO_API_KEY: a1c49f65-f552-436c-81af-9c9170a7fac9'
-        ];
-        $qs = http_build_query($parameters); // query string encode the parameters
-        $request = "{$url}?{$qs}"; // create the request URL
-        $curl = curl_init(); // Get cURL resource
-        // Set cURL options
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $request,            // set the request URL
-            CURLOPT_HTTPHEADER => $headers,     // set the headers
-            CURLOPT_RETURNTRANSFER => 1         // ask for raw response instead of bool
-        ));
-        $response = curl_exec($curl); // Send the request, save the response
-        curl_close($curl); // Close request
-        $dataAPI = json_decode($response, true);// print json decoded response
-        return $dataAPI['data'];
-    }
+//    public function getAPI()
+//    {
+//        $url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest';
+//        $parameters = [
+//            // on récupère les 10 cryptos les plus courantes.
+//            'symbol' => 'BTC,ETH,BNB,USDT,SOL,XRP,ADA,USDC,LUNA,AVAX',
+//            'convert' => 'EUR'
+//        ];
+//        $headers = [
+//            'Accepts: application/json',
+//            'X-CMC_PRO_API_KEY: a1c49f65-f552-436c-81af-9c9170a7fac9'
+//        ];
+//        $qs = http_build_query($parameters); // query string encode the parameters
+//        $request = "{$url}?{$qs}"; // create the request URL
+//        $curl = curl_init(); // Get cURL resource
+//        // Set cURL options
+//        curl_setopt_array($curl, array(
+//            CURLOPT_URL => $request,            // set the request URL
+//            CURLOPT_HTTPHEADER => $headers,     // set the headers
+//            CURLOPT_RETURNTRANSFER => 1         // ask for raw response instead of bool
+//        ));
+//        $response = curl_exec($curl); // Send the request, save the response
+//        curl_close($curl); // Close request
+//        $dataAPI = json_decode($response, true);// print json decoded response
+//        return $dataAPI['data'];
+//    }
 
     // Calcul de la rentabilité pour une crypto = (prix acheté * quantité acheté) - (prix API * quantité acheté)
     // Donc on boucle avec pour prendre en compte la quantité
 
-    public function getRentability(ManagerRegistry $doctrine): float
-    {
-        $dataAPI = $this->getAPI();
-        $myCryptos = $doctrine->getRepository(Mycrypto::class)->findAll();
-        $totalWithMyCryptoPrice = 0;
-        $TotalWithApiPrice = 0;
-        foreach ($myCryptos as $crypto) {
-            $totalWithMyCryptoPrice += $crypto->getPrice() * $crypto->getQuantity();
-            foreach ($dataAPI as $key => $value) {
-                if ($value["symbol"] === $crypto->getCrypto()->getSymbol()) {
-
-                    $TotalWithApiPrice += $value["quote"]["EUR"]["price"] * $crypto->getQuantity();
-                }
-            }
-        }
-        $rentability = round($totalWithMyCryptoPrice - $TotalWithApiPrice);
-        return $rentability;
-    }
+//    public function getRentability(ManagerRegistry $doctrine): float
+//    {
+//        $dataAPI = $this->getAPI();
+//        $myCryptos = $doctrine->getRepository(Mycrypto::class)->findAll();
+//        $totalWithMyCryptoPrice = 0;
+//        $TotalWithApiPrice = 0;
+//        foreach ($myCryptos as $crypto) {
+//            $totalWithMyCryptoPrice += $crypto->getPrice() * $crypto->getQuantity();
+//            foreach ($dataAPI as $key => $value) {
+//                if ($value["symbol"] === $crypto->getCrypto()->getSymbol()) {
+//
+//                    $TotalWithApiPrice += $value["quote"]["EUR"]["price"] * $crypto->getQuantity();
+//                }
+//            }
+//        }
+//        $rentability = round($totalWithMyCryptoPrice - $TotalWithApiPrice);
+//        return $rentability;
+//    }
 
     // achat de cryptos
     #[Route('/buycrypto', name: 'app_buycrypto')]
@@ -165,6 +159,7 @@ class CryptoController extends AbstractController
 
 
     // Graphique de la rentabilité, on récupère les sauvegardes pour l'alimenter
+
     /**
      * @Route("/chart", name="chart")
      */

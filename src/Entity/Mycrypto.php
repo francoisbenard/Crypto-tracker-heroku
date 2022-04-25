@@ -13,13 +13,20 @@ class Mycrypto
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[Assert\Positive]
+    #[Assert\NotNull]
     #[ORM\Column(type: 'float')]
     private $price;
 
+    #[Assert\Positive]
+    #[Assert\NotNull]
+    #[Assert\Type(
+        type: 'integer',
+    )]
     #[ORM\Column(type: 'integer')]
     private $quantity;
 
-    #[ORM\ManyToOne(targetEntity: Cryptolist::class, inversedBy: 'Mycryptos')]
+    #[ORM\ManyToOne(targetEntity: Cryptolist::class, inversedBy: 'mycryptos')]
     private $crypto;
 
     public function getId(): ?int

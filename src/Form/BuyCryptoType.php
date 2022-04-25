@@ -18,24 +18,24 @@ class BuyCryptoType extends AbstractType
             ->add('crypto', EntityType::class, [
                 'class' => Cryptolist::class,
                 'choice_label' => 'name',])
-            ->add('quantity', NumberType::class, array (
+            ->add('quantity', NumberType::class, [
+                'required' => true,
+                'scale' => 0,
+                'html5' => true,
+                'attr' => [
+                    'min' => 1,
+//                    'step' => 0.01,
+                ],
+            ])
+            ->add('price', NumberType::class, [
                 'required' => true,
                 'scale' => 2,
-                'attr' => array(
-                    'min' => 0,
-                    'max' => 1000000,
-                    'step' => 0.0000001,
-                ),
-            ))
-            ->add('price', NumberType::class, array (
-                'required' => true,
-                'scale' => 2,
-                'attr' => array(
-                    'min' => 0,
-                    'max' => 1000000,
-                    'step' => 0.0000001,
-                ),
-            ));
+                'html5' => true,
+                'attr' => [
+                    'min' => 0.01,
+                    'step' => 0.01,
+                ],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
